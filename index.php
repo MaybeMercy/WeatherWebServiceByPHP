@@ -1,6 +1,6 @@
 <?php
   header("Content-type:text/html;charset=utf-8");
-  $base_url = "http://www.webxml.com.cn/WebServices/WeatherWebService.asmx/getWeatherbyCityName";
+  $base_url = "http://www.webxml.com.cn/WebServices/WeatherWebService.asmx?wsdl";
   # has the data
   $hasName = false;
   if(isset($_REQUEST['theCityName'])){
@@ -28,19 +28,17 @@
          * Time: 19:42
          */
         if($hasName){
-            $fields=array(
-                'theCityName'=>$_REQUEST['theCityName']
-            );
-            $ch=curl_init();
-            curl_setopt($ch,CURLOPT_URL,$base_url);
-            curl_setopt($ch,CURLOPT_POST,count($fields));
-            curl_setopt($ch,CURLOPT_POSTFIELDS,$fields);
-            ob_start();
-            curl_exec($ch);
-            $result=ob_get_contents();
-            ob_end_clean();
-            echo $result;
-            curl_close($ch);
+            $client = new SoapClient($base_url);
+            try {
+                $parameter = array("theCityName"=>$_REQUEST['theCityName']);
+                $funcs = $client->__getFunctions();
+                var_dump($funcs);
+                var_dump($parameter);
+                $result = $client->getWeatherbyCityName($parameter);
+                var_dump($result);
+            } catch(SoapFault $e) {
+                print "Sorry an error was caught executing your request: {$e->getMessage()}";
+            }
         }
         ?>
     </div>
