@@ -3,6 +3,7 @@
   $base_url = "http://www.webxml.com.cn/WebServices/WeatherWebService.asmx?wsdl";
   # has the data
   $hasName = false;
+  $weather_infor = array();
   if(isset($_REQUEST['theCityName'])){
      $hasName = true;
   }
@@ -32,15 +33,49 @@
             try {
                 $parameter = array("theCityName"=>$_REQUEST['theCityName']);
                 $funcs = $client->__getFunctions();
-                var_dump($funcs);
-                var_dump($parameter);
                 $result = $client->getWeatherbyCityName($parameter);
-                var_dump($result);
+                # result is a stdclass
+                $value = get_object_vars($result);
+                #var_dump($value);
+                $infor = $value['getWeatherbyCityNameResult'];
+                # infor is stdclass
+                $infor_more = get_object_vars($infor);
+                #var_dump($infor_more);
+                $weather_infor = $infor_more['string'];
+                # var_dump($weather_infor);
+                # var_dump($result);
             } catch(SoapFault $e) {
                 print "Sorry an error was caught executing your request: {$e->getMessage()}";
             }
         }
         ?>
     </div>
+    <table>
+        <thead>
+         <td>date</td>
+         <td>temperature</td>
+         <td>wind</td>
+        </thead>
+        <tbody>
+        <?php
+        if($hasName)
+        echo "<tr>
+            <td>".$weather_infor['6']."</td>
+            <td>".$weather_infor['5']."</td>
+            <td>".$weather_infor['7']."</td>
+        </tr>
+        <tr>
+            <td>".$weather_infor['13']."</td>
+            <td>".$weather_infor['12']."</td>
+            <td>".$weather_infor['14']."</td>
+        </tr>
+        <tr>
+            <td>".$weather_infor['18']."</td>
+            <td>".$weather_infor['17']."</td>
+            <td>".$weather_infor['19']."</td>
+        </tr>";
+        ?>
+        </tbody>
+    </table>
 </body>
 </html>
